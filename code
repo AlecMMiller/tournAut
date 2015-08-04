@@ -57,16 +57,16 @@ function display(){ # Display field video in OBS
 
 
 echo "please select the OBS window"
-#obswindow="$(xdotool selectwindow)"
+obswindow="$(xdotool selectwindow)"
 
 echo "please select the terminal window"
-#terminalwindow="$(xdotool selectwindow)"
+terminalwindow="$(xdotool selectwindow)"
 
 echo "please select the field control window"
-#controlwindow="$(xdotool selectwindow)"
+controlwindow="$(xdotool selectwindow)"
 
 echo "please select the tournament manager window"
-#managerwindow="$(xdotool selectwindow)"
+managerwindow="$(xdotool selectwindow)"
 
 function reset(){
 	xdotool windowactivate $obswindow

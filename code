@@ -1,0 +1,129 @@
+#!/bin/bash
+
+# xRes = 1366 - these are totally unused, just here so I can remember my screen resolution
+# yRes = 768
+
+obsX=0
+obsY=700
+
+standX=600
+
+termY=140
+
+managerY=200
+
+controlY=325
+
+offsetX=760
+offsetY=600
+offsetY2=270
+
+sceneX=50
+scene1Y=600
+scene2Y=620
+scene3Y=640
+
+startX=1050
+startY=380
+
+displayX=1180
+resultsY=380
+inmatchY=360
+
+inputX=1050
+inputY=640
+
+fieldVal=0
+stage=0
+
+# Mouse click functions
+scene1 () { xdotool mousemove $sceneX $scene1Y click 1; }
+scene2 () { xdotool mousemove $sceneX $scene2Y click 1; }
+scene3 () { xdotool mousemove $sceneX $scene3Y click 1; }
+start () { xdotool mousemove $startX $startY click 1; }
+inmatch () { xdotool mousemove $displayX $inmatchY click 1; }
+results () { xdotool mousemove $displayX $resultsY click 1; }
+getInput () { xdotool mousemove $inputX $inputY; xdotool click 1; }
+
+function display(){ # Display field video in OBS
+	fieldVal="$( echo $fieldVal | tr 01 10)" # Switch which feed to use
+	if [ "$fieldVal" == "0" ] 
+	then
+		scene1
+	else
+		scene2
+	fi
+}
+
+
+echo "please select the OBS window"
+#obswindow="$(xdotool selectwindow)"
+
+echo "please select the terminal window"
+#terminalwindow="$(xdotool selectwindow)"
+
+echo "please select the field control window"
+#controlwindow="$(xdotool selectwindow)"
+
+echo "please select the tournament manager window"
+#managerwindow="$(xdotool selectwindow)"
+
+function reset(){
+	xdotool windowactivate $obswindow
+	xdotool windowsize $obswindow $obsX $obsY
+	xdotool windowmove $obswindow 0 0
+
+	xdotool windowactivate $terminalwindow	
+	xdotool windowsize $terminalwindow $standX $termY
+	xdotool windowmove $terminalwindow $offsetX $offsetY
+
+	xdotool windowsize $controlwindow $standX $controlY
+	xdotool windowmove $controlwindow $offsetX $offsetY2
+	
+	xdotool windowsize $managerwindow $standX $managerY
+	xdotool windowmove $managerwindow $offsetX 0
+}
+
+#reset
+
+while true
+do
+	getInput # Select terminal window for input
+	read -n 1 c # Get next character of input
+
+	if [ "$c" == "+" ] 
+	then
+		stage=$((stage+1)) # Increment cycle
+
+		case "$stage" in
+		"1")
+			echo " - Teams Confirm Ready"
+			inmatch # Display match info
+			display # Display field feed
+			;;
+		"2")
+			echo " - Autonomous"
+			start # Enable robots
+			;;
+		"3")
+			echo " - Driver Control"
+			start # Enable robots
+			sleep 115 # Wait until match is over
+			echo "+ - Displaying Results"
+			results # Display results
+			scene3 # No chroma display mode
+			stage=0 # Go back to start of cycle
+			;;
+		esac
+	elif [ "$c" == "0" ]
+	then
+		echo " - Switching Displayed Field"
+		display # Switch field that's displayed
+	elif [ "$c" == "*" ]
+		echo " - Resetting Window Positions"
+		reset # Reset window positions
+	fi
+
+	sleep 1 #Prevent accidental double input
+
+done

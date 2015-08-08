@@ -84,7 +84,7 @@ function reset(){
 	xdotool windowmove $managerwindow $offsetX 0
 }
 
-#reset
+reset
 
 while true
 do
@@ -120,6 +120,7 @@ do
 		echo " - Switching Displayed Field"
 		display # Switch field that's displayed
 	elif [ "$c" == "*" ]
+	then
 		echo " - Resetting Window Positions"
 		reset # Reset window positions
 	fi

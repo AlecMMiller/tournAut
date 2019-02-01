@@ -1,34 +1,45 @@
+
 #!/bin/bash
 
-# xRes = 1366 - these are totally unused, just here so I can remember my screen resolution
-# yRes = 768
+padding=30
 
-obsX=0
-obsY=700
+xRes=1920
+yRes=1080
 
-standX=600
+obsX=1200
+obsY=600
 
-termY=140
+control_width=500
 
-managerY=200
+termXSize=$(($obsX-$control_width))
+termYSize=$(($yRes-$obsY-$padding-$padding))
 
-controlY=325
+termXPos=$control_width
+termYPos=$(($obsY+$padding))
 
-offsetX=760
-offsetY=600
-offsetY2=270
+controlXPos=0
+controlYPos=$termYPos
+
+managerXPos=$obsX
+managerYPos=0
+
+managerYSize=$yRes
+managerXSize=$(($xRes-$obsX))
 
 sceneX=50
-scene1Y=600
-scene2Y=620
-scene3Y=640
+scene1Y=475
+scene2Y=495
+scene3Y=515
 
-startX=1050
-startY=380
+startX=$(($controlXPos+250))
+startY=$(($controlYPos+130))
 
-displayX=1180
-resultsY=380
-inmatchY=360
+queueX=$(($controlXPos+85))
+queueY=$(($controlYPos+120))
+
+displayX=$(($controlXPos+335))
+resultsY=$(($controlYPos+120))
+inmatchY=$(($controlYPos+100))
 
 inputX=1050
 inputY=640
@@ -43,7 +54,8 @@ scene3 () { xdotool mousemove $sceneX $scene3Y click 1; }
 start () { xdotool mousemove $startX $startY click 1; }
 inmatch () { xdotool mousemove $displayX $inmatchY click 1; }
 results () { xdotool mousemove $displayX $resultsY click 1; }
-getInput () { xdotool mousemove $inputX $inputY; xdotool click 1; }
+getInput () { xdotool mousemove $(($termXPos+10)) $(($termYPos+100)); xdotool click 1; }
+queue () { xdotool mousemove $queueX $queueY click 1; }
 
 function display(){ # Display field video in OBS
 	fieldVal="$( echo $fieldVal | tr 01 10)" # Switch which feed to use
@@ -74,14 +86,13 @@ function reset(){
 	xdotool windowmove $obswindow 0 0
 
 	xdotool windowactivate $terminalwindow	
-	xdotool windowsize $terminalwindow $standX $termY
-	xdotool windowmove $terminalwindow $offsetX $offsetY
+	xdotool windowsize $terminalwindow $termXSize $termYSize
+	xdotool windowmove $terminalwindow $termXPos $termYPos
 
-	xdotool windowsize $controlwindow $standX $controlY
-	xdotool windowmove $controlwindow $offsetX $offsetY2
+	xdotool windowmove $controlwindow $controlXPos $controlYPos
 	
-	xdotool windowsize $managerwindow $standX $managerY
-	xdotool windowmove $managerwindow $offsetX 0
+	xdotool windowsize $managerwindow $managerXSize $managerYSize
+	xdotool windowmove $managerwindow $managerXPos $managerYPos
 }
 
 reset
@@ -112,6 +123,7 @@ do
 			echo "+ - Displaying Results"
 			results # Display results
 			scene3 # No chroma display mode
+			queue
 			stage=0 # Go back to start of cycle
 			;;
 		esac
